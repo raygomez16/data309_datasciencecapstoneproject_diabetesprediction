@@ -1,0 +1,116 @@
+---
+title: "Pre-processing"
+author: "Seavchhun Teng"
+date: "2025-08-01"
+output:
+  pdf_document: default
+  pdf: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(ggplot2)
+library("patchwork")
+library(gtsummary)
+```
+
+### Data Collection
+
+```{r}
+# Pull data from github
+link <- "https://raw.githubusercontent.com/arinbasu/data309/refs/heads/main/diabetes_prediction_data.csv"
+
+data = read.csv(link)
+```
+
+```{r}
+# Show 20 rows of the data
+head(data, 20)
+```
+
+- Age is numerical.
+
+- Blood Glucose Level is numerical.
+
+### Data Cleaning
+
+```{r}
+# Check for any missing data
+anyNA(data$age)
+anyNA(data$blood_glucose_level)
+```
+
+## Plotting
+
+```{r}
+# Plotting Histogram of age with Freedman-Diaconis Rule
+binwidth_age <- 2 * IQR(data$age) / length(data$age)^(1/3)
+age_hist1 <- ggplot(data, aes(x = age)) +
+  geom_histogram(binwidth = binwidth_age, fill = "steelblue", color = "black") +
+  labs(title = "Age Histogram",
+       x = "Age", y = "Count")
+
+# Plotting Histogram of age with Freedman-Diaconis Rule doubled
+age_hist2 <- ggplot(data, aes(x = age)) +
+  geom_histogram(binwidth = binwidth_age * 2, fill = "steelblue", color = "black") +
+  labs(title = "Age Histogram",
+       x = "Age", y = "Count")
+
+age_hist1 + age_hist2
+```
+
+
+```{r}
+# Plotting Histogram of blood glucose level with Freedman-Diaconis Rule
+binwidth_bgl <- 2 * IQR(data$blood_glucose_level) / length(data$blood_glucose_level)^(1/3)
+bgl_hist1 <- ggplot(data, aes(x = blood_glucose_level)) +
+  geom_histogram(binwidth = binwidth_bgl, fill = "steelblue", color = "black") +
+  labs(title = "Blood Glucose Level Histogram",
+       x = "Blood Glucose Level", y = "Count")
+
+# Plotting Histogram of blood glucose level with Freedman-Diaconis Rule doubled
+bgl_hist2 <- ggplot(data, aes(x = blood_glucose_level)) +
+  geom_histogram(binwidth = binwidth_bgl * 2, fill = "steelblue", color = "black") +
+  labs(title = "Blood Glucose Level Histogram",
+       x = "Blood Glucose Level", y = "Count")
+
+bgl_hist1 + bgl_hist2
+```
+
+### Summarizing the data
+
+```{r}
+tbl_summary(data)
+tbl_summary(
+  data = data,
+  include = age,
+  type = list(age = "continuous2"),
+  statistic = list(age ~ c("{mean} ({sd})",   # mean (SD)
+                                  "Median: {median}",  # median
+                                  "IQR: {p25} - {p75}")))
+summary(data$age)
+summary(data$blood_glucose_level)
+```
+
+```{r}
+# Statistical summary of age
+stat_age <- data %>%
+  summarise(
+    mean_age   = mean(age, na.rm = TRUE),
+    median_age = median(age, na.rm = TRUE),
+    sd_age     = sd(age, na.rm = TRUE)
+  )
+
+# Statistical summary of blood glucose level
+stat_bgl <- data %>%
+  summarise(
+    mean_bgl   = mean(blood_glucose_level, na.rm = TRUE),
+    median_bgl = median(blood_glucose_level, na.rm = TRUE),
+    sd_bgl     = sd(blood_glucose_level, na.rm = TRUE)
+  )
+
+stat_age
+stat_bgl
+```
