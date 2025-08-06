@@ -38,3 +38,4 @@ summary(clean_dataset$bmi)
 smoking_history_graph <- ggplot(clean_dataset, aes(x=smoking_history)) + geom_bar(fill="steelblue") + labs(title = "Smoking History Bar Plot", x="Smoking History", y="Count") + geom_text(stat = "count", aes(label = ..count..), vjust = -0.5)
 smoking_history_graph
 
+##
