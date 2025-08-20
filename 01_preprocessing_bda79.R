@@ -1,6 +1,5 @@
 source("00_cleaning_final.R")
 
-#2. Summary and Plotting
 #Summarise the variables of mine
 dataset_new %>%
   summarise(
@@ -45,16 +44,44 @@ summary_counts <- dataset_new %>%
 
 print(summary_counts)
 
+#Heart Disease and Diabetes Gender breakdown
+#each bar is a count of heart disease of each gender with also who has diabetes or not
 ggplot(summary_counts, aes(x = gender, y = Count, fill = diabetes)) +
   geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
   facet_wrap(~ heart_disease) +
   labs(
-    title = "Count by Gender, Diabetes, and Heart Disease",
+    title = "Count of Gender Associated with Heart Disease and Diabetes",
     y = "Count",
     x = "Gender",
     fill = "Diabetes Status"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12)  
+  )
+
+#same thing but count of diabetes of each gender with those who have heart disease or not
+ggplot(summary_counts, aes(x = gender, y = Count, fill = heart_disease)) +
+  geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
+  facet_wrap(~ diabetes) +
+  labs(
+    title = "Count of Gender Associated with Diabetes and Heart Disease",
+    y = "Count",
+    x = "Gender",
+    fill = "Heart Disease Status"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12) 
+  )
 
 summary_counts2 <- dataset_new %>%
   group_by(diabetes, gender) %>%
@@ -62,15 +89,23 @@ summary_counts2 <- dataset_new %>%
 
 print(summary_counts2)
 
+#Diabetes and Gender Breakdown
 ggplot(summary_counts2, aes(x = gender, y = Count, fill = diabetes)) +
   geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
   labs(
-    title = "Count by Gender and Diabetes",
+    title = "Count of Gender Associated with Diabetes",
     y = "Count",
     x = "Gender",
     fill = "Diabetes Status"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12)  
+  )
 
 summary_counts3 <- dataset_new %>%
   group_by(heart_disease, diabetes) %>%
@@ -78,15 +113,41 @@ summary_counts3 <- dataset_new %>%
 
 print(summary_counts3)
 
+#Those who have heart disease count with a diabetes breakdown
 ggplot(summary_counts3, aes(x = heart_disease, y = Count, fill = diabetes)) +
   geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
   labs(
-    title = "Count by Diabetes, and Heart Disease",
+    title = "Count of Heart Disease Associated with Diabetes",
     y = "Count",
     x = "Heart Disease",
     fill = "Diabetes Status"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12)  
+  )
+
+#other way around for the previous plot
+ggplot(summary_counts3, aes(x = diabetes, y = Count, fill = heart_disease)) +
+  geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
+  labs(
+    title = "Count of Diabetes Associated with Heart Disease",
+    y = "Count",
+    x = "Diabetes",
+    fill = "Heart Disease Status"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12)  
+  )
 
 summary_counts4 <- dataset_new %>%
   group_by(heart_disease, gender) %>%
@@ -94,13 +155,20 @@ summary_counts4 <- dataset_new %>%
 
 print(summary_counts4)
 
-ggplot(summary_counts4, aes(x = heart_disease, y = Count, fill = gender)) +
+#Heart disease gender breakdown
+ggplot(summary_counts4, aes(x = gender, y = Count, fill = heart_disease)) +
   geom_bar(stat = "identity", position = "stack") +
+  geom_text(
+    aes(label = Count),
+    position = position_stack(vjust = 0.5), 
+    color = "black", size = 2.5) +
   labs(
-    title = "Count by Gender, and Heart Disease",
+    title = "Count of Gender Associated with Heart Disease",
     y = "Count",
-    x = "Heart Disease",
-    fill = "Diabetes Status"
+    x = "Gender",
+    fill = "Heart Disease"
   ) +
-  theme_minimal()
-
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.2, size = 12)  
+  )
