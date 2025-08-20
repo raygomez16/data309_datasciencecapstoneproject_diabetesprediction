@@ -34,8 +34,8 @@ class(clean_dataset$bmi)
 clean_dataset %>% count(clean_dataset$smoking_history)
 
 #Box plot for BMI
-bmi_ranges <- boxplot(clean_dataset$bmi, main = "Individual's BMI Levels", xlab="BMI Level", horizontal = TRUE)
-summary(clean_dataset$bmi)
+#bmi_ranges <- boxplot(clean_dataset$bmi, main = "Individual's BMI Levels", xlab="BMI Level", horizontal = TRUE)
+#summary(clean_dataset$bmi)
 
 #Filtering out 'other' gender as the population is too small to be considered effective.
 gender_subset <- filter(clean_dataset, clean_dataset$gender %in% c('female','male'))
@@ -45,7 +45,7 @@ smoking_history_graph <- ggplot(gender_subset, aes(x=smoking_history)) + geom_ba
 smoking_history_graph
 
 #smoking_history plot based on gender
-ggplot(clean_dataset, aes(smoking_history, fill=gender)) + labs(title = "Smoking History based on Gender", x = "Smoking history",
+ggplot(gender_subset, aes(smoking_history, fill=gender)) + labs(title = "Smoking History based on Gender", x = "Smoking history",
                                                                 y = "Count") + geom_bar(position = "stack") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue"))
 
 #bmi plot with gender comparison
@@ -53,10 +53,12 @@ ggplot(clean_dataset, aes(smoking_history, fill=gender)) + labs(title = "Smoking
 
 #generating value ranges for BMI data
 custom_intervals <- c(0, 18.5, 24.9, 29.9, 49.9, 100)
-bmi_data <- gender_subset$newcol %>% 
+bmi_data <- gender_subset$bmi %>% 
   cut(gender_subset$bmi, breaks = custom_intervals, include.lowest = TRUE, labels = c("0-18.5", "18.5-24.9", "25-29.9", "30-49.9", "50-100"))
 
-ggplot(bmi_data, aes(age, bmi)) + geom_histogram(aes(colour = gender), alpha = 0.5) + facet_wrap(~gender)
+gender_subset$bmi <- as.character(bmi_data)
+
+ggplot(gender_subset, aes(bmi, fill=gender)) + labs(title = "BMI ranges based on gender", x='BMI Ranges', y= "Count")+geom_bar(position = "stack") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue"))
 
 
 
