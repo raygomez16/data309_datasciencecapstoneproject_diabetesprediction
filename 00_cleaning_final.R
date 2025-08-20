@@ -11,7 +11,7 @@ dataset_original %>%
 
 # check data types
 glimpse(dataset_original)
-  
+
 ### PER VARIABLE CLEANING ###
 
 # gender
@@ -74,10 +74,17 @@ dataset_new <- dataset_original %>%
 dataset_new <- dataset_original %>%
   filter(!duplicated(.))
 
-# counts
-nrow(dataset_original)
-nrow(dataset_new)
 
- 
+# samples 80% of data for training set
+# remaining 20% is for test set
 
-         
+set.seed(123)
+dataset_train_80 <- dataset_new %>%
+  sample_frac(0.8)
+
+dataset_test_20 <- dataset_new %>%
+  anti_join(dataset_train_80, by = names(dataset_new))
+
+
+
+
