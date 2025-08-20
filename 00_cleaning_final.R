@@ -28,13 +28,13 @@ dataset_original <- dataset_original %>%
 dataset_original %>%
   distinct(hypertension) 
 dataset_original <- dataset_original %>%
-  mutate(hypertension = factor(hypertension, levels = c(0, 1), labels = c('no', 'yes')))
+  mutate(hypertension = as.integer(hypertension))
 
 # heart disease
 dataset_original %>%
   distinct(heart_disease)
 dataset_original <- dataset_original %>%
-  mutate(heart_disease = factor(heart_disease, levels = c(0, 1), labels = c('no', 'yes')))
+  mutate(heart_disease = as.integer(heart_disease))
 
 # smoking history
 dataset_original %>%
@@ -60,7 +60,7 @@ dataset_original <- dataset_original %>%
 dataset_original %>%
   distinct(diabetes)
 dataset_original <- dataset_original %>%
-  mutate(diabetes = factor(diabetes, levels = c(0, 1), labels = c('no', 'yes')))
+  mutate(diabetes = as.integer(diabetes))
 
 glimpse(dataset_original)
 
@@ -73,7 +73,6 @@ dataset_new <- dataset_original %>%
 # creates a new dataset without the duplicated rows
 dataset_new <- dataset_original %>%
   filter(!duplicated(.))
-
 
 # samples 80% of data for training set
 # remaining 20% is for test set

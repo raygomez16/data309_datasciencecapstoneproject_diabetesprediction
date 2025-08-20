@@ -1,0 +1,200 @@
+---
+title: "Pre-processing"
+author: "Seavchhun Teng"
+date: "2025-08-01"
+output:
+  pdf_document: default
+  pdf: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+source('00_cleaning_final.R')
+library(tidyverse)
+library(ggplot2)
+library("patchwork")
+library(gtsummary)
+```
+
+### Data Collection
+
+
+```{r}
+# Show 20 rows of the data
+head(dataset_new, 20)
+```
+
+- Age is numerical.
+
+- Blood Glucose Level is numerical.
+
+## Plotting
+
+```{r}
+# Plotting Histogram of age with Freedman-Diaconis Rule
+binwidth_age <- 2 * IQR(dataset_new$age) / length(dataset_new$age)^(1/3)
+age_hist1 <- ggplot(dataset_new, aes(x = age)) +
+  geom_histogram(binwidth = binwidth_age, fill = "steelblue", color = "black") +
+  labs(title = "Age Histogram",
+       x = "Age", y = "Count")
+
+# Plotting Histogram of age with Freedman-Diaconis Rule doubled
+age_hist2 <- ggplot(dataset_new, aes(x = age)) +
+  geom_histogram(binwidth = binwidth_age * 2, fill = "steelblue", color = "black") +
+  labs(title = "Age Histogram",
+       x = "Age", y = "Count")
+
+age_hist1 + age_hist2
+```
+
+
+```{r}
+# Plotting Histogram of blood glucose level with Freedman-Diaconis Rule
+binwidth_bgl <- 2 * IQR(dataset_new$blood_glucose_level) / length(dataset_new$blood_glucose_level)^(1/3)
+bgl_hist1 <- ggplot(dataset_new, aes(x = blood_glucose_level)) +
+  geom_histogram(binwidth = binwidth_bgl, fill = "steelblue", color = "black") +
+  labs(title = "Blood Glucose Level Histogram",
+       x = "Blood Glucose Level", y = "Count")
+
+# Plotting Histogram of blood glucose level with Freedman-Diaconis Rule doubled
+bgl_hist2 <- ggplot(dataset_new, aes(x = blood_glucose_level)) +
+  geom_histogram(binwidth = binwidth_bgl * 2, fill = "steelblue", color = "black") +
+  labs(title = "Blood Glucose Level Histogram",
+       x = "Blood Glucose Level", y = "Count")
+
+bgl_hist1 + bgl_hist2
+```
+
+### Summarizing the data
+
+```{r}
+# Summary for the whole data
+tbl_summary(dataset_new)
+# Summary for age
+# tbl_summary(
+#   data = dataset_new,
+#   include = age,
+#   type = list(age = "continuous2"),
+#   statistic = list(age ~ c("{mean} ({sd})",   # mean (SD)
+#                                   "Median: {median}",  # median
+#                                   "IQR: {p25} - {p75}")))
+summary(dataset_new$age)
+summary(dataset_new$blood_glucose_level)
+```
+
+```{r}
+# Statistical summary of age
+stat_age <- dataset_new %>%
+  summarise(
+    mean_age   = mean(age, na.rm = TRUE),
+    median_age = median(age, na.rm = TRUE),
+    sd_age     = sd(age, na.rm = TRUE)
+  )
+
+# Statistical summary of blood glucose level
+stat_bgl <- dataset_new %>%
+  summarise(
+    mean_bgl   = mean(blood_glucose_level, na.rm = TRUE),
+    median_bgl = median(blood_glucose_level, na.rm = TRUE),
+    sd_bgl     = sd(blood_glucose_level, na.rm = TRUE)
+  )
+
+stat_age
+stat_bgl
+```
+```{r}
+# data1 <- dataset_new %>%
+#   mutate(
+#     gender = as.factor(gender),
+#     `heart_disease` = factor(heart_disease, levels = c(0, 1), labels = c("No", "Yes")),
+#     diabetes = factor(diabetes, levels = c(0, 1), labels = c("No", "Yes")))
+# 
+# head(data1, 20)
+
+```
+
+### Group by Diagnosis
+
+```{r}
+# Group age by diagnosis and summarize
+age_by_diagnosis <- dataset_new %>%
+  group_by(diabetes) %>%
+  summarize(
+    mean_age   = mean(age, na.rm = TRUE),
+    median_age = median(age, na.rm = TRUE),
+    sd_age     = sd(age, na.rm = TRUE),
+    )
+age_by_diagnosis
+
+# Group blood glucose level by diagnosis and summarize
+bgl_by_diagnosis <- dataset_new %>%
+  group_by(diabetes) %>%
+  summarize(
+    mean_bgl   = mean(blood_glucose_level, na.rm = TRUE),
+    median_bgl = median(blood_glucose_level, na.rm = TRUE),
+    sd_bgl     = sd(blood_glucose_level, na.rm = TRUE)
+  )
+bgl_by_diagnosis
+  
+```
+
+### Group by Diagnosis and Gender
+
+```{r}
+# Drop "Other" gender as it contributes < 0.1%
+# Group age by diagnosis and gender
+age_by_gender <- dataset_new %>%
+  filter(gender != "Other") %>%
+  group_by(gender, diabetes) %>%
+  summarize(
+    mean_age   = mean(age, na.rm = TRUE),
+    median_age = median(age, na.rm = TRUE),
+    sd_age     = sd(age, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  unite("group", gender, diabetes, sep = "_")
+age_by_gender
+
+# Group blood glucose level by diagnosis and gender
+bgl_by_gender <- dataset_new %>%
+  filter(gender != "Other") %>%
+  group_by(gender, diabetes) %>%
+  summarize(
+    mean_bgl   = mean(blood_glucose_level, na.rm = TRUE),
+    median_bgl = median(blood_glucose_level, na.rm = TRUE),
+    sd_bgl     = sd(blood_glucose_level, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  unite("group", gender, diabetes, sep = "_")
+bgl_by_gender
+
+```
+
+## Plotting
+
+```{r}
+plot_age_diagnosis <- age_by_diagnosis %>%
+  pivot_longer(c(mean_age, median_age, sd_age), names_to = "Statistic", values_to = "Value") %>%
+  mutate(Statistic = recode(Statistic,
+                       mean_age = "Mean Age",
+                       median_age = "Median Age",
+                       sd_age = "SD Age"))
+
+ggplot(plot_age_diagnosis, aes(x = diabetes, y = Value, fill = Statistic)) +
+  geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
+  labs(title = "Mean, Median, and SD for Age by Diagnosis", x = "Diagnosis", y = "Age", fill = "")
+
+plot_bgl_diagnosis <- bgl_by_diagnosis %>%
+  pivot_longer(c(mean_bgl, median_bgl, sd_bgl), names_to = "Statistic", values_to = "Value") %>%
+  mutate(Statistic = recode(Statistic,
+                       mean_bgl = "Mean BGL",
+                       median_bgl = "Median BGL",
+                       sd_bgl = "SD BGL"))
+
+ggplot(plot_bgl_diagnosis, aes(x = diabetes, y = Value, fill = Statistic)) +
+  geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
+  labs(title = "Mean, Median, and SD of Blood Glucose Level by Diagnosis", x = "Diagnosis", y = "Age", fill = "")
+  
+```
+
