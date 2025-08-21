@@ -13,12 +13,11 @@ head(dataset_new, 20)
 ## Logistic Regression Model Reduction
 
 ```{r}
-
-
 reduced1_model1 <- glm(diabetes ~ gender + age + heart_disease + smoking_history + bmi + HbA1c_level + blood_glucose_level, data = dataset_new, family = "binomial")
 AIC(reduced1_model1)
 
 ```
+
 ```{r}
 variables <- c("gender", "age", "hypertension", "heart_disease", "smoking_history", "bmi", "HbA1c_level", "blood_glucose_level")
 full_model_logi <- glm(diabetes ~., data = dataset_new, family = 'binomial')
