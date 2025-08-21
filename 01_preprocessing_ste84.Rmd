@@ -152,8 +152,7 @@ age_by_gender <- dataset_new %>%
     median_age = median(age, na.rm = TRUE),
     sd_age     = sd(age, na.rm = TRUE),
     .groups = "drop"
-  ) %>%
-  unite("group", gender, diabetes, sep = "_")
+  )
 age_by_gender
 
 # Group blood glucose level by diagnosis and gender
@@ -165,8 +164,7 @@ bgl_by_gender <- dataset_new %>%
     median_bgl = median(blood_glucose_level, na.rm = TRUE),
     sd_bgl     = sd(blood_glucose_level, na.rm = TRUE),
     .groups = "drop"
-  ) %>%
-  unite("group", gender, diabetes, sep = "_")
+  )
 bgl_by_gender
 
 ```
@@ -196,5 +194,31 @@ ggplot(plot_bgl_diagnosis, aes(x = diabetes, y = Value, fill = Statistic)) +
   geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
   labs(title = "Mean, Median, and SD of Blood Glucose Level by Diagnosis", x = "Diagnosis", y = "Age", fill = "")
   
+```
+
+```{r}
+plot_age_gender <- age_by_gender %>%
+  pivot_longer(c(mean_age, median_age, sd_age), names_to = "Statistic", values_to = "Value") %>%
+  mutate(Statistic = recode(Statistic,
+                       mean_age = "Mean Age",
+                       median_age = "Median Age",
+                       sd_age = "SD Age"))
+
+ggplot(plot_age_gender, aes(x = diabetes, y = Value, fill = Statistic)) +
+  geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
+  facet_wrap(~ gender) +
+  labs(title = "Mean, Median, and SD for Age by Diagnosis", x = "Diagnosis", y = "Age", fill = "")
+
+plot_bgl_gender <- bgl_by_gender %>%
+  pivot_longer(c(mean_bgl, median_bgl, sd_bgl), names_to = "Statistic", values_to = "Value") %>%
+  mutate(Statistic = recode(Statistic,
+                       mean_bgl = "Mean BGL",
+                       median_bgl = "Median BGL",
+                       sd_bgl = "SD BGL"))
+
+ggplot(plot_bgl_gender, aes(x = diabetes, y = Value, fill = Statistic)) +
+  geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
+  facet_wrap(~ gender) +
+  labs(title = "Mean, Median, and SD for Blood Glucose Level by Diagnosis", x = "Diagnosis", y = "Blood Glucose Level", fill = "")
 ```
 
