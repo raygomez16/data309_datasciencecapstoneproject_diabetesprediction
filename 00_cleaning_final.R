@@ -123,7 +123,7 @@ nrow(dataset_original)
 nrow(dataset_new)
 
 ############################################################
-#split the cleaned dataset into
+#split the cleaned dataset into training and test
 set.seed(42)  # for reproducibility
 
 n <- nrow(dataset_new) # total rows
