@@ -46,7 +46,8 @@ smoking_history_graph
 
 #smoking_history plot based on gender
 ggplot(gender_subset, aes(smoking_history, fill=gender)) + labs(title = "Smoking History based on Gender", x = "Smoking history",
-                                                                y = "Count") + geom_bar(position = "stack") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue"))
+                                                                y = "Count") + geom_bar(position = "dodge") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue")) +
+  geom_text(stat = "count", aes(label = after_stat(count)), position = position_dodge(width = 0.9), vjust=-0.25)
 
 #bmi plot with gender comparison
 #ggplot(gender_subset, aes(age, bmi)) + geom_point(aes(colour = gender), alpha = 0.5) + facet_wrap(~gender)
@@ -58,7 +59,8 @@ bmi_data <- gender_subset$bmi %>%
 
 gender_subset$bmi <- as.character(bmi_data)
 
-ggplot(gender_subset, aes(bmi, fill=gender)) + labs(title = "BMI ranges based on gender", x='BMI Ranges', y= "Count")+geom_bar(position = "stack") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue"))
+ggplot(gender_subset, aes(bmi, fill=gender)) + labs(title = "BMI ranges based on gender", x='BMI Ranges', y= "Count")+geom_bar(position = "dodge") + scale_fill_manual(values = c("female" = "pink", "male" = "lightblue")) +
+  geom_text(stat = "count", aes(label = after_stat(count)), position = position_dodge(width = 0.9), vjust=-0.25)
 
 
 
