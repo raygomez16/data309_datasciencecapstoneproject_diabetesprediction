@@ -233,4 +233,3 @@ ggplot(plot_bgl_gender, aes(x = diabetes, y = Value, fill = Statistic)) +
   facet_wrap(~ gender) +
   labs(title = "Mean, Median, and SD for Blood Glucose Level by Diagnosis", x = "Diagnosis", y = "Blood Glucose Level", fill = "")
 ```
-
