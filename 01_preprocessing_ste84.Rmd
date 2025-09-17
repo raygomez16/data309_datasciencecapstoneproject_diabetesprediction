@@ -145,7 +145,11 @@ bgl_by_diagnosis
 # Drop "Other" gender as it contributes < 0.1%
 # Group age by diagnosis and gender
 age_by_gender <- dataset_new %>%
-  filter(gender != "Other") %>%
+  mutate(gender = case_when(
+    male == 1 ~ "Male",
+    female == 1 ~ "Female",
+    other == 1 ~ "Other",
+  )) %>%
   group_by(gender, diabetes) %>%
   summarize(
     mean_age   = mean(age, na.rm = TRUE),
@@ -157,7 +161,11 @@ age_by_gender
 
 # Group blood glucose level by diagnosis and gender
 bgl_by_gender <- dataset_new %>%
-  filter(gender != "Other") %>%
+  mutate(gender = case_when(
+    male == 1 ~ "Male",
+    female == 1 ~ "Female",
+    other == 1 ~ "Other",
+  )) %>%
   group_by(gender, diabetes) %>%
   summarize(
     mean_bgl   = mean(blood_glucose_level, na.rm = TRUE),
@@ -177,7 +185,8 @@ plot_age_diagnosis <- age_by_diagnosis %>%
   mutate(Statistic = recode(Statistic,
                        mean_age = "Mean Age",
                        median_age = "Median Age",
-                       sd_age = "SD Age"))
+                       sd_age = "SD Age"),
+         diabetes = factor(diabetes, levels = c(0, 1), labels = c("No", "Yes")))
 
 ggplot(plot_age_diagnosis, aes(x = diabetes, y = Value, fill = Statistic)) +
   geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
@@ -188,7 +197,8 @@ plot_bgl_diagnosis <- bgl_by_diagnosis %>%
   mutate(Statistic = recode(Statistic,
                        mean_bgl = "Mean BGL",
                        median_bgl = "Median BGL",
-                       sd_bgl = "SD BGL"))
+                       sd_bgl = "SD BGL"),
+         diabetes = factor(diabetes, levels = c(0, 1), labels = c("No", "Yes")))
 
 ggplot(plot_bgl_diagnosis, aes(x = diabetes, y = Value, fill = Statistic)) +
   geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
@@ -202,7 +212,8 @@ plot_age_gender <- age_by_gender %>%
   mutate(Statistic = recode(Statistic,
                        mean_age = "Mean Age",
                        median_age = "Median Age",
-                       sd_age = "SD Age"))
+                       sd_age = "SD Age"),
+         diabetes = factor(diabetes, levels = c(0, 1), labels = c("No", "Yes")))
 
 ggplot(plot_age_gender, aes(x = diabetes, y = Value, fill = Statistic)) +
   geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
@@ -214,7 +225,8 @@ plot_bgl_gender <- bgl_by_gender %>%
   mutate(Statistic = recode(Statistic,
                        mean_bgl = "Mean BGL",
                        median_bgl = "Median BGL",
-                       sd_bgl = "SD BGL"))
+                       sd_bgl = "SD BGL"),
+         diabetes = factor(diabetes, levels = c(0, 1), labels = c("No", "Yes")))
 
 ggplot(plot_bgl_gender, aes(x = diabetes, y = Value, fill = Statistic)) +
   geom_col(width = 0.6, position = position_dodge(width = 0.6)) +
