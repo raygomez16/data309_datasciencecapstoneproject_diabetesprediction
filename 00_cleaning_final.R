@@ -1,6 +1,8 @@
 library(ggplot2)
 library(tidyverse)
 library(tidyr)
+library(scales)
+library(patchwork)
 
 # retrieve data from GithUb repository
 source <- "https://raw.githubusercontent.com/arinbasu/data309/refs/heads/main/diabetes_prediction_data.csv"
